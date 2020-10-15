@@ -1,3 +1,4 @@
+import re
 import requests
 import time
 import re
@@ -12,7 +13,7 @@ authorlist = []
 depth = 2
 
 #TODO: Use the click package to take in arguments
-url = "https://www.duanewaddle.com/"
+url = "https://www.amsurg.com"
 
 linklist.append(url)
 
@@ -30,11 +31,9 @@ def AddLinkToLinkList(url, linklist):
     return linklist
 
 def AddToWordList(word, wordlist):
-    print(word)
     words = word.split(" ")
     for w in words:
-        x = re.search("[a-zA_Z]{4,}", w)
-        #TODO: Remove Special Characters
+        x = re.search("^[a-zA-Z]{4,}$", w)
         if x:
             if(w in wordlist):
                 print(f"Word: {w} already in list")
@@ -56,8 +55,6 @@ def ParsePage(url, wordlist, emaillist, authorlist):
         req = requests.get(url)
         soup = BeautifulSoup(req.text, 'html.parser')
         for text in soup.stripped_strings:
-            #TODO: Check if its an email
-            #TODO: Check if its a document
             wordlist = AddToWordList(text, wordlist)
         return wordlist
     except:
@@ -72,7 +69,13 @@ def GetLinks(url, linklist):
 
         for a in anchors:
             try:
+                #TODO: Needs to handle hrefs that are only relative paths and not full links.
                 newURL = f"{a.attrs['href']}"
+                r = re.search("\.", newURL)
+                if r:
+                    pass
+                else:
+                    newURL = f"{url}{a.attrs['href']}"
                 linklist = AddLinkToLinkList(newURL, linklist)
             except:
                 print("Error 1")
@@ -87,9 +90,8 @@ if __name__ == "__main__":
     linklist = GetLinks(url, linklist)
     
     for site in linklist:
-        ParsePage(site, wordlist, emaillist, authorlist)
+       wordlist = ParsePage(site, wordlist, emaillist, authorlist)
     print(wordlist)
-    
 
 
    
