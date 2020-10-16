@@ -18,7 +18,19 @@ pip3 install -r requirements.txt
 ```
 
 ## Usage
+```
+Usage: pycewl.py [OPTIONS]
 
+Options:
+  --url TEXT                  URL to run scan against
+  --speed [Slow|Medium|Fast]  Time between page parsings,
+                              Fast=0,Medium=2,Slow=10
+
+  --useragent TEXT            Set custom user-agent. Default = PyCeWL 1.0
+  --verbose TEXT              Set verbosity
+  --email                     Show emails gathered from spider
+  --help                      Show this message and exit.
+```
 
 
 ## License
