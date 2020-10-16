@@ -11,7 +11,7 @@ cd PyCeWL
 
 python3 -m venv venv
 
-source activate venv/bin/activate
+source venv/bin/activate
 
 pip3 install -r requirements.txt
 
