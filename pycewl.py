@@ -12,7 +12,7 @@ authorlist = []
 speed = 'Medium'
 verbose = True
 
-#TODO: Add Commandline Args -url, -speed (SLOW, MEDIUM, FAST), -Output, -Verbose
+#TODO: Add Commandline Args -url, -speed (SLOW, MEDIUM, FAST), -Output, -Verbose, -user-agent, --email, --emailoutput, 
 url = "http://amsurg.com"
 linklist.append(url)
 
@@ -75,6 +75,8 @@ def GetLinks(url, linklist):
                 if r:
                     pass
                 else:
+                    #TODO: Need to parse out the root of the base url so it can append better here if the 
+                    #url entered is not a root url.
                     newURL = f"{url}{a.attrs['href']}"
                 linklist = AddLinkToLinkList(newURL, linklist)
             except:
