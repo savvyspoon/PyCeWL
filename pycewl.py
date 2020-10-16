@@ -1,7 +1,7 @@
 import re
 import requests
-import time
 import re
+import time
 from bs4 import BeautifulSoup
 
 
@@ -9,45 +9,46 @@ linklist = []
 wordlist = []
 emaillist = []
 authorlist = []
+speed = 'Medium'
+verbose = True
 
-depth = 2
-
-#TODO: Use the click package to take in arguments
-url = "https://www.amsurg.com"
-
+#TODO: Add Commandline Args -url, -speed (SLOW, MEDIUM, FAST), -Output, -Verbose
+url = "http://amsurg.com"
 linklist.append(url)
 
 def AddLinkToLinkList(url, linklist):
     if(url in linklist):
-        print(f"URL: {url} already in list")
+        if(verbose == True):
+            print(f"URL: {url} already in list")
     else:
         urlRoot = url.split("/")
         domainRoot = linklist[0].split("/")
         if(urlRoot[2] == domainRoot[2]):
             linklist.append(url)
-            print(f"URL: {url} added to list")
+            if(verbose == True):
+                print(f"URL: {url} added to list")
         else:
-            print(f"URL: {url} is not in scope")
+            if(verbose == True):
+                print(f"URL: {url} is not in scope")
     return linklist
 
-def AddToWordList(word, wordlist):
+def AddToWordList(word, wordlist, emaillist, authorlist):
     words = word.split(" ")
     for w in words:
+        email = re.search(".+\@.+\..+", w)
+        if email:
+            emaillist.append(w)
         x = re.search("^[a-zA-Z]{4,}$", w)
         if x:
             if(w in wordlist):
-                print(f"Word: {w} already in list")
+                if(verbose == True):
+                    print(f"Word: {w} already in list")
             else:
                 wordlist.append(w)
         else:
-            print(f"Word: {w} is not a word")
-    return wordlist
-
-def AddEmailtoEmailList(email, emaillist):
-    pass
-
-def AddAuthortoAuthorList(author, authorlist):
-    pass
+            if(verbose == True):
+                print(f"Word: {w} is not a word")
+    return wordlist, emaillist, authorlist
 
 def ParsePage(url, wordlist, emaillist, authorlist):
     print(f"Page {url} is being scanned")
@@ -55,11 +56,11 @@ def ParsePage(url, wordlist, emaillist, authorlist):
         req = requests.get(url)
         soup = BeautifulSoup(req.text, 'html.parser')
         for text in soup.stripped_strings:
-            wordlist = AddToWordList(text, wordlist)
-        return wordlist
+            wordlist, emaillist, authorlist = AddToWordList(text, wordlist, emaillist, authorlist)
+        return wordlist, emaillist, authorlist
     except:
-        #TODO: Better Error messages
-        print("Error 3")
+        if(verbose == True):
+            print("Error 3")
 
 def GetLinks(url, linklist):
     try:
@@ -69,7 +70,6 @@ def GetLinks(url, linklist):
 
         for a in anchors:
             try:
-                #TODO: Needs to handle hrefs that are only relative paths and not full links.
                 newURL = f"{a.attrs['href']}"
                 r = re.search("\.", newURL)
                 if r:
@@ -78,45 +78,39 @@ def GetLinks(url, linklist):
                     newURL = f"{url}{a.attrs['href']}"
                 linklist = AddLinkToLinkList(newURL, linklist)
             except:
-                print("Error 1")
+                if(verbose == True):
+                    print(f"Couldn't add {newURL} to linklist")
         return linklist
     except:
-        print("Error 2")
+        if(verbose == True):
+            print(f"Error: Something went wrong with {newURL}")
     
-
-
 if __name__ == "__main__":
     #TODO: Allow for several levels of recursion 
+    if(verbose == True):
+        print(linklist)
     linklist = GetLinks(url, linklist)
-    
     for site in linklist:
-       wordlist = ParsePage(site, wordlist, emaillist, authorlist)
+
+        if(speed == "Fast"):
+            pass
+        elif(speed == "Medium"):
+            time.sleep(2)
+        else:
+            time.sleep(10)
+        
+        wordlist, emaillist, authorlist = ParsePage(site, wordlist, emaillist, authorlist)
+    #TODO: Create a function to output to file
     print(wordlist)
+    print(emaillist)
 
 
    
 
 #General TODOs
 #TODO: Create a log option
-#TODO: Dress up the messaging back to the user
-#TODO: Async
+#TODO: Dress up the messaging back to the user. Add color
+#TODO: Function to check urls for validity
 
 
-
-# Get a website from commandline or file
-
-#Create method to handle words being put to it
-
-#Scan the website for documents and links
-
-#For each link
-
-    #Handle Documents
-        #check for metadata about author
-        #check for email addresses
-        #Get list of words
-
-    #Handle sites
-        #check for email addresses
-        #Get list of words
 
